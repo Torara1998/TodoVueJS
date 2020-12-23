@@ -1,12 +1,23 @@
 <template>
-  <div>
+  <div
+    style="
+    height: 500px;
+    overflow: auto;
+    overflow-x: hidden;
+"
+  >
     <div
       class="row justify-content-md-center flex-rơw-reverse"
-      v-for="todo in todos"
+      v-for="(todo, index) in todos"
       :key="todo.id"
     >
       <div class="col-6 todo-container">
-        <todo :todo="todo" @removeTodo="removeTodo"></todo>
+        <todo
+          :todo="todo"
+          :index="index"
+          @removeTodo="removeTodo"
+          @updateTodo="updateTodo"
+        ></todo>
       </div>
     </div>
     <div class="mt-3">
@@ -72,6 +83,7 @@
 
 <script>
 import Todo from "../components/Todo";
+import { getTodo, addTodo, deleteTodo, updateTodo } from "../services/store";
 export default {
   components: {
     Todo
@@ -83,7 +95,7 @@ export default {
           id: 1,
           title: "todo1",
           isFinished: true,
-          created_at: Date.now().toString(),
+          createdAt: Date.now().toString(),
           items: [
             { id: 1, title: "Fix UI", isFinished: true },
             { id: 2, title: "Testing", isFinished: false },
@@ -94,7 +106,7 @@ export default {
           id: 2,
           title: "Work to do",
           isFinished: true,
-          created_at: Date.now().toString(),
+          createdAt: Date.now().toString(),
           items: [
             { id: 1, title: "Fix UI", isFinished: false },
             { id: 2, title: "Testing", isFinished: false },
@@ -105,7 +117,7 @@ export default {
           id: 3,
           title: "Must done!",
           isFinished: true,
-          created_at: Date.now().toString(),
+          createdAt: Date.now().toString(),
           items: [
             { id: 1, title: "Fix UI", isFinished: true },
             { id: 2, title: "Testing", isFinished: false },
@@ -117,16 +129,22 @@ export default {
       isAdding: false
     };
   },
+  created() {
+    this.todos = getTodo();
+  },
   methods: {
     addTodo() {
-      if (this.newTodo != "")
-        this.todos.push({
-          id: this.todos.length + 1,
+      if (this.newTodo != "") {
+        let newTodoObj = {
           title: this.newTodo,
           isFinished: false,
-          items: []
-        });
-      this.resetInput();
+          items: [],
+          createdAt: new Date()
+        };
+        // this.todos.push(newTodoObj);
+        addTodo(newTodoObj);
+        this.resetInput();
+      }
     },
     resetInput() {
       this.newTodo = "";
@@ -135,7 +153,12 @@ export default {
       const index = this.todos.findIndex(todo => todo.id == todoId);
       if (index >= 0) {
         this.todos.splice(index, 1);
+        deleteTodo(todoId)
       }
+    },
+    updateTodo(payload) {
+      // this.todos.splice(payload.index, 1, payload.todo);
+      updateTodo(payload.todo)
     }
   }
 };

@@ -1,9 +1,17 @@
 <template>
   <div>
-    <div class="d-flex flex-row mt-3 mb-3 row align-items-center">
-      <p class="h4 todo-title col-lg-6">{{ todo.title }}</p>
+    <div
+      v-if="!isEdittingTodo"
+      class="d-flex flex-row mt-3 mb-3 row align-items-center"
+    >
+      <p @dblclick="toggleEditTodo(true)" class="h4 todo-title col-lg-6">
+        {{ todo.title }}
+      </p>
+
       <div class="col-lg-6">
-        <button class="btn btn-warning"><i class="fa fa-edit"></i></button>
+        <button class="btn btn-warning" @click="toggleEditTodo(true)">
+          <i class="fa fa-edit"></i>
+        </button>
         <button class="btn btn-danger" @click="removeTodo(todo.id)">
           <i class="fa fa-remove"></i>
         </button>
@@ -18,6 +26,15 @@
         </button>
       </div>
     </div>
+    <input
+      v-else
+      @keydown.esc="toggleEditTodo(false)"
+      @keypress.enter="updateTodo(todo)"
+      type="text"
+      class="form-control"
+      v-model="editTodoTitle"
+      placeholder="Enter to add. Esc to cancel"
+    />
     <div class="progress mt-2">
       <div
         class="progress-bar"
@@ -35,40 +52,13 @@
           v-for="(item, index) in todo.items"
           :key="item.id"
         >
-          <div class="d-flex flex-row row align-items-center">
-            <div
-              v-if="!isEditting"
-              class="col-lg-6"
-              :class="item.isFinished ? 'todo-done' : 'todo-not-done'"
-            >
-              <input
-                class="float-left item-checkbox"
-                type="checkbox"
-                @change="checkFinished(index)"
-                :checked="item.isFinished"
-              />
-              <span>{{ item.title }}</span>
-            </div>
-            <div v-else>
-              <input
-                type="text"
-                class="form-control"
-                v-model="editItem"
-                :id="'input_edit-item' + item.id"
-                placeholder="Press Enter to add. Esc to cancel"
-                @keypress.enter="updateItem"
-                @keydown.esc="toggleInput(false)"
-              />
-            </div>
-            <div class="col-lg-6">
-              <button class="btn" @click="toggleEdit">
-                <i class="fa fa-edit"></i>
-              </button>
-              <button class="btn" @click="removeItem(index)">
-                <i class="fa fa-remove"></i>
-              </button>
-            </div>
-          </div>
+          <item
+            :item="item"
+            :index="index"
+            @checkFinished="checkFinished"
+            @removeItem="removeItem"
+            @updateItem="updateItem"
+          ></item>
         </li>
       </ul>
       <div class="form-group mt-3" v-show="isAdding">
@@ -96,19 +86,28 @@
 </template>
 
 <script>
+import Item from "../components/Item";
 export default {
-  props: ["todo"],
+  components: {
+    Item
+  },
+  props: ["todo", "index"],
   data() {
     return {
       isAdding: false,
       newItem: "",
-      editItem: "",
-      isEditting: false
+      editTodoTitle: this.todo.title,
+      isEdittingTodo: false
     };
   },
   computed: {
     getProgressTodo() {
       let a = this.todo.items.length;
+      if (!a)
+        return {
+          width: "0%"
+        };
+
       let countDone = 0;
       this.todo.items.forEach(item => {
         if (item.isFinished) countDone++;
@@ -142,9 +141,25 @@ export default {
         this.todo.items.splice(index, 1);
       }
     },
-    updateItem(index) {},
-    toggleEdit() {
-      this.isEditting = true;
+
+    updateTodo(todo) {
+      if (this.editTodoTitle != "") {
+        let newTodo = {
+          id: this.todo.id,
+          title: this.editTodoTitle,
+          isFinished: this.todo.isFinished,
+          items: this.todo.items,
+          createdAt: this.todo.createdAt
+        };
+        this.$emit("updateTodo", { index: this.index, todo: newTodo });
+        this.toggleEditTodo(false);
+      }
+    },
+    updateItem(payload) {
+      this.todo.items.splice(payload.index, 1, payload.item);
+    },
+    toggleEditTodo(value) {
+      this.isEdittingTodo = value;
     }
   }
 };
@@ -159,13 +174,6 @@ export default {
   transform: scale(2);
 }
 
-.todo-done {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
-.todo-not-done {
-  text-decoration: none;
-}
 .add-item {
   height: 40px;
   width: 40px;

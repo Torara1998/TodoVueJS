@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import * as fb from "../plugins/firebase";
+
 export default {
   data() {
     return {
@@ -88,7 +90,16 @@ export default {
   },
   methods: {
     signup() {
-      console.log(this.dob);
+      fb.auth
+        .createUserWithEmailAndPassword(this.email, this.password)
+        .then(response => {
+          console.log(response);
+          this.$router.push("/login");
+        })
+        .catch(error => {
+          // Handle Errors here.
+          console.log(error);
+        });
     },
     openLogin() {
       this.$router.replace("/login");

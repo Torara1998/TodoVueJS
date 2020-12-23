@@ -4,9 +4,12 @@
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
+
+# Create firebase-config.js inside folder src/plugins
+# write your key and you are ready to start
 
 # serve with hot reload at localhost:8080
 npm run dev

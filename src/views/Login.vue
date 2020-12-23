@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import * as fb from "../plugins/firebase";
+
 export default {
   data() {
     return {
@@ -50,7 +52,14 @@ export default {
   },
   methods: {
     login() {
-      console.log(this.email + this.password);
+      fb.auth
+        .signInWithEmailAndPassword(this.email, this.password)
+        .then(response => {
+          this.$router.push("/todos");
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     openSignup() {
       this.$router.replace("/signup");
