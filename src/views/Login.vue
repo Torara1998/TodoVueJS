@@ -50,12 +50,15 @@ export default {
       password: ""
     };
   },
+  created() {
+    if (fb.auth.currentUser) this.$router.push("/");
+  },
   methods: {
     login() {
       fb.auth
         .signInWithEmailAndPassword(this.email, this.password)
         .then(response => {
-          this.$router.push("/todos");
+          this.$router.push("/");
         })
         .catch(error => {
           console.log(error);

@@ -70,8 +70,6 @@ const deleteItem = (index) => {
 
 }
 
-const logout = () => {
-    fb.auth.signOut()
-}
 
-export { logout, getTodo, addTodo, updateItem, updateTodo, addItem, deleteItem, deleteTodo }
+
+export { getTodo, addTodo, updateItem, updateTodo, addItem, deleteItem, deleteTodo }

@@ -3,11 +3,12 @@
 </template>
 
 <script>
-import { logout } from "../services/store";
+import { auth } from "../plugins/firebase";
 export default {
   created() {
-    logout();
-    this.$router.push("/login");
+    auth.signOut().then(response => {
+      this.$router.push("/login");
+    });
   }
 };
 </script>

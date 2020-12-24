@@ -8,7 +8,8 @@
 </template>
 
 <script>
-import Navbar from './components/Navbar'
+import Navbar from "./components/Navbar";
+import * as fb from "./plugins/firebase";
 export default {
   name: "App",
   components: {

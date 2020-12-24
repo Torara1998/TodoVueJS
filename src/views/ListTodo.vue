@@ -150,15 +150,17 @@ export default {
       this.newTodo = "";
     },
     removeTodo(todoId) {
-      const index = this.todos.findIndex(todo => todo.id == todoId);
-      if (index >= 0) {
-        this.todos.splice(index, 1);
-        deleteTodo(todoId)
+      if (confirm("Do you really want to delete?")) {
+        const index = this.todos.findIndex(todo => todo.id == todoId);
+        if (index >= 0) {
+          this.todos.splice(index, 1);
+          deleteTodo(todoId);
+        }
       }
     },
     updateTodo(payload) {
       // this.todos.splice(payload.index, 1, payload.todo);
-      updateTodo(payload.todo)
+      updateTodo(payload.todo);
     }
   }
 };

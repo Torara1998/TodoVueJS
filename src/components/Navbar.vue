@@ -16,16 +16,20 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <router-link
-            v-show="getCurrentAuth"
-            to="/todos"
+            v-show="isAuthenticated"
+            to="/"
             tag="a"
-            class="nav-item nav-link active"
+            :class="
+              getCurrentRoute == '/'
+                ? 'nav-item nav-link active'
+                : 'nav-item nav-link'
+            "
             >Todos</router-link
           >
           <router-link
             tag="a"
             to="/logout"
-            v-show="getCurrentAuth"
+            v-show="isAuthenticated"
             class="nav-item nav-link"
             href="#"
             >Logout</router-link
@@ -33,16 +37,24 @@
           <router-link
             tag="a"
             to="/login"
-            v-show="!getCurrentAuth"
-            class="nav-item nav-link"
+            v-show="!isAuthenticated"
+            :class="
+              getCurrentRoute == '/login'
+                ? 'nav-item nav-link active'
+                : 'nav-item nav-link'
+            "
             href="#"
             >Login</router-link
           >
           <router-link
             tag="a"
             to="/signup"
-            v-show="!getCurrentAuth"
-            class="nav-item nav-link"
+            v-show="!isAuthenticated"
+            :class="
+              getCurrentRoute == '/signup'
+                ? 'nav-item nav-link active'
+                : 'nav-item nav-link'
+            "
             href="#"
             >Signup</router-link
           >
@@ -55,15 +67,24 @@
 <script>
 import { auth } from "../plugins/firebase";
 export default {
+  data() {
+    return {
+      isAuthenticated: auth.currentUser ? true : false
+    };
+  },
   computed: {
-    getCurrentAuth() {
-      if (auth.currentUser) {
-        console.log("is logged in");
-
-        return true;
+    getCurrentRoute() {
+      return this.$route.path;
+    }
+  },
+  watch: {
+    $route(to, from) {
+      // react to route changes...
+      if (to.name == "Login" || to.name == "Signup") {
+        this.isAuthenticated = false;
+      } else if (to.name == "Todos") {
+        this.isAuthenticated = true;
       }
-      console.log("logout");
-      return false;
     }
   }
 };

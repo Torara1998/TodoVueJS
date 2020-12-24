@@ -20,8 +20,8 @@ const routes = [
     component: Signup
   },
   {
-    path: '/todos',
-    name: 'Todos',
+    path: '/',
+    name: "Todos",
     component: ListTodo,
     meta: {
       requiresAuth: true
@@ -47,6 +47,7 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !auth.currentUser) {
     next('/login')
   } else {
+
     next()
   }
 })

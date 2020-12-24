@@ -137,8 +137,10 @@ export default {
       this.newItem = "";
     },
     removeItem(index) {
-      if (index >= 0) {
-        this.todo.items.splice(index, 1);
+      if (confirm("Do you really want to delete?")) {
+        if (index >= 0) {
+          this.todo.items.splice(index, 1);
+        }
       }
     },
 

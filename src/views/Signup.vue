@@ -88,6 +88,9 @@ export default {
       username: ""
     };
   },
+  created() {
+    if (fb.auth.currentUser) this.$router.push("/");
+  },
   methods: {
     signup() {
       fb.auth
