@@ -55,7 +55,7 @@ export default {
       fb.auth
         .signInWithEmailAndPassword(this.email, this.password)
         .then(response => {
-          this.$router.push("/todos");
+          this.$router.push("/");
         })
         .catch(error => {
           console.log(error);

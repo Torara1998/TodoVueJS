@@ -17,7 +17,7 @@
         <div class="navbar-nav">
           <router-link
             v-show="getCurrentAuth"
-            to="/todos"
+            to="/"
             tag="a"
             class="nav-item nav-link active"
             >Todos</router-link

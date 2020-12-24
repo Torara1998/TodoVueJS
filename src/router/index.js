@@ -20,7 +20,7 @@ const routes = [
     component: Signup
   },
   {
-    path: '/todos',
+    path: '/',
     name: 'Todos',
     component: ListTodo,
     meta: {
