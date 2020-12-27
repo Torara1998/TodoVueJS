@@ -44,7 +44,7 @@ let router = new Router({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
 
-  if (requiresAuth && !auth.currentUser) {
+  if (requiresAuth && !localStorage.getItem("access_token")) {
     next('/login')
   } else {
 

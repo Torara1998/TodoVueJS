@@ -83,7 +83,7 @@
 
 <script>
 import Todo from "../components/Todo";
-import { getTodo, addTodo, deleteTodo, updateTodo } from "../services/store";
+// import { getTodo, addTodo, deleteTodo, updateTodo } from "../services/store";
 export default {
   components: {
     Todo
@@ -91,58 +91,74 @@ export default {
   data() {
     return {
       todos: [
-        {
-          id: 1,
-          title: "todo1",
-          isFinished: true,
-          createdAt: Date.now().toString(),
-          items: [
-            { id: 1, title: "Fix UI", isFinished: true },
-            { id: 2, title: "Testing", isFinished: false },
-            { id: 3, title: "Re-check", isFinished: true }
-          ]
-        },
-        {
-          id: 2,
-          title: "Work to do",
-          isFinished: true,
-          createdAt: Date.now().toString(),
-          items: [
-            { id: 1, title: "Fix UI", isFinished: false },
-            { id: 2, title: "Testing", isFinished: false },
-            { id: 3, title: "Re-check", isFinished: true }
-          ]
-        },
-        {
-          id: 3,
-          title: "Must done!",
-          isFinished: true,
-          createdAt: Date.now().toString(),
-          items: [
-            { id: 1, title: "Fix UI", isFinished: true },
-            { id: 2, title: "Testing", isFinished: false },
-            { id: 3, title: "Re-check", isFinished: true }
-          ]
-        }
+        // {
+        //   id: 1,
+        //   name: "todo1",
+        //   done: true,
+        //   createdAt: Date.now().toString(),
+        //   items: [
+        //     { id: 1, name: "Fix UI", done: true },
+        //     { id: 2, name: "Testing", done: false },
+        //     { id: 3, name: "Re-check", done: true }
+        //   ]
+        // },
+        // {
+        //   id: 2,
+        //   name: "Work to do",
+        //   done: true,
+        //   createdAt: Date.now().toString(),
+        //   items: [
+        //     { id: 1, name: "Fix UI", done: false },
+        //     { id: 2, name: "Testing", done: false },
+        //     { id: 3, name: "Re-check", done: true }
+        //   ]
+        // },
+        // {
+        //   id: 3,
+        //   name: "Must done!",
+        //   done: true,
+        //   createdAt: Date.now().toString(),
+        //   items: [
+        //     { id: 1, name: "Fix UI", done: true },
+        //     { id: 2, name: "Testing", done: false },
+        //     { id: 3, name: "Re-check", done: true }
+        //   ]
+        // }
       ],
       newTodo: "",
       isAdding: false
     };
   },
   created() {
-    this.todos = getTodo();
+    // this.todos = getTodo();
+    this.axios
+      .get("/task_lists")
+      .then(response => {
+        this.todos = response.data;
+      })
+      .catch(error => {});
   },
   methods: {
     addTodo() {
       if (this.newTodo != "") {
         let newTodoObj = {
-          title: this.newTodo,
-          isFinished: false,
+          name: this.newTodo,
+          done: false,
           items: [],
           createdAt: new Date()
         };
         // this.todos.push(newTodoObj);
-        addTodo(newTodoObj);
+        // addTodo(newTodoObj);
+        this.axios
+          .post("/task_lists", {
+            name: this.newTodo
+          })
+          .then(response => {
+            this.todos.push(response.data);
+          })
+          .catch(error => {
+            console.log(error.response.data);
+          });
         this.resetInput();
       }
     },
@@ -151,16 +167,31 @@ export default {
     },
     removeTodo(todoId) {
       if (confirm("Do you really want to delete?")) {
-        const index = this.todos.findIndex(todo => todo.id == todoId);
-        if (index >= 0) {
-          this.todos.splice(index, 1);
-          deleteTodo(todoId);
-        }
+        this.axios
+          .delete("/task_lists/" + todoId)
+          .then(response => {
+            const index = this.todos.findIndex(todo => todo.id == todoId);
+            if (index >= 0) {
+              this.todos.splice(index, 1);
+            }
+          })
+          .catch(error => {
+            console.log(error.response.data);
+          });
       }
     },
     updateTodo(payload) {
-      // this.todos.splice(payload.index, 1, payload.todo);
-      updateTodo(payload.todo);
+      // updateTodo(payload.todo);
+      this.axios
+        .put("/task_lists/" + payload.todo.id, {
+          name: payload.todo.name
+        })
+        .then(response => {
+          this.todos.splice(payload.index, 1, payload.todo);
+        })
+        .catch(error => {
+          console.log(error.response.data);
+        });
     }
   }
 };

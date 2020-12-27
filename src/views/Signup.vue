@@ -1,17 +1,18 @@
 <template>
   <div class="row justify-content-md-center h-100">
     <div class="col col-sm-5 col-md-5 login-form">
+      <div v-show="errors.length > 0" class="alert alert-danger" role="alert">
+        <div v-for="error in errors" :key="error">{{ error.toString() }}</div>
+      </div>
       <div class="form-group">
-        <label class="font-weight-bold" for="exampleInputusername1"
-          >User name</label
-        >
+        <label class="font-weight-bold" for="exampleInputname1">Name</label>
         <input
-          type="username"
+          type="name"
           class="form-control"
-          id="exampleInputusername1"
-          aria-describedby="usernameHelp"
-          placeholder="Enter username"
-          v-model="username"
+          id="exampleInputname1"
+          aria-describedby="nameHelp"
+          placeholder="Enter name"
+          v-model="name"
         />
       </div>
       <div class="form-group">
@@ -76,7 +77,7 @@
 </template>
 
 <script>
-import * as fb from "../plugins/firebase";
+// import * as fb from "../plugins/firebase";
 
 export default {
   data() {
@@ -85,23 +86,43 @@ export default {
       password: "",
       confirmPassword: "",
       dob: "",
-      username: ""
+      name: "",
+      errors: []
     };
   },
   created() {
-    if (fb.auth.currentUser) this.$router.push("/");
+    if (localStorage.getItem("access_token")) this.$router.push("/");
   },
   methods: {
     signup() {
-      fb.auth
-        .createUserWithEmailAndPassword(this.email, this.password)
+      // fb.auth
+      //   .createUserWithEmailAndPassword(this.email, this.password)
+      //   .then(response => {
+      //     console.log(response);
+      //     this.$router.push("/login");
+      //   })
+      //   .catch(error => {
+      //     // Handle Errors here.
+      //     console.log(error);
+      //   });
+      this.axios
+        .post("/auth", {
+          email: this.email,
+          password: this.password,
+          name: this.name
+        })
         .then(response => {
-          console.log(response);
-          this.$router.push("/login");
+          localStorage.setItem(
+            "access_token",
+            response.headers["access-token"]
+          );
+          localStorage.setItem("uid", response.headers.uid);
+          localStorage.setItem("client", response.headers.client);
+          this.errors = [];
+          this.$router.push("/");
         })
         .catch(error => {
-          // Handle Errors here.
-          console.log(error);
+          this.errors = error.response.data.errors.full_messages;
         });
     },
     openLogin() {

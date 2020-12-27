@@ -10,13 +10,13 @@
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js",
     "deploy": "sh deploy.sh"
-
   },
   "dependencies": {
     "axios": "^0.21.0",
     "firebase": "^8.2.1",
     "request": "^2.79.0",
     "vue": "^2.5.2",
+    "vue-axios": "^3.2.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

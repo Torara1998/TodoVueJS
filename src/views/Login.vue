@@ -1,6 +1,9 @@
 <template>
   <div class="row justify-content-md-center h-100">
     <div class="col col-sm-5 col-md-5 login-form">
+      <div v-show="errors.length > 0" class="alert alert-danger" role="alert">
+        <div v-for="error in errors" :key="error">{{ error.toString() }}</div>
+      </div>
       <div class="form-group">
         <label class="font-weight-bold" for="exampleInputEmail1"
           >Email address</label
@@ -41,27 +44,46 @@
 </template>
 
 <script>
-import * as fb from "../plugins/firebase";
+// import * as fb from "../plugins/firebase";
 
 export default {
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
+      errors: []
     };
   },
   created() {
-    if (fb.auth.currentUser) this.$router.push("/");
+    if (localStorage.getItem("access_token")) this.$router.push("/");
   },
   methods: {
     login() {
-      fb.auth
-        .signInWithEmailAndPassword(this.email, this.password)
+      // fb.auth
+      //   .signInWithEmailAndPassword(this.email, this.password)
+      //   .then(response => {
+      //     this.$router.push("/");
+      //   })
+      //   .catch(error => {
+      //     console.log(error);
+      //   });
+      this.axios
+        .post("/auth/sign_in", {
+          email: this.email,
+          password: this.password
+        })
         .then(response => {
+          localStorage.setItem(
+            "access_token",
+            response.headers["access-token"]
+          );
+          localStorage.setItem("uid", response.headers.uid);
+          localStorage.setItem("client", response.headers.client);
+          this.errors = [];
           this.$router.push("/");
         })
         .catch(error => {
-          console.log(error);
+          if (error.response.data) this.errors = error.response.data.errors;
         });
     },
     openSignup() {

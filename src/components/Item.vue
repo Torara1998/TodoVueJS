@@ -3,21 +3,21 @@
     <div
       v-if="!isEdittingItem"
       class="col-lg-6"
-      :class="item.isFinished ? 'todo-done' : 'todo-not-done'"
+      :class="item.done ? 'todo-done' : 'todo-not-done'"
     >
       <input
         class="float-left item-checkbox"
         type="checkbox"
         @change="checkFinished(index)"
-        :checked="item.isFinished"
+        :checked="item.done"
       />
-      <span @dblclick="toggleEditItem(true)">{{ item.title }}</span>
+      <span @dblclick="toggleEditItem(true)">{{ item.name }}</span>
     </div>
     <div v-else>
       <input
         type="text"
         class="form-control"
-        v-model="editItemTitle"
+        v-model="editItemName"
         :id="'input_edit-item' + item.id"
         placeholder="Press Enter to add. Esc to cancel"
         @keypress.enter="updateItem(item)"
@@ -28,7 +28,7 @@
       <button class="btn" @click="toggleEditItem(true)">
         <i class="fa fa-edit"></i>
       </button>
-      <button class="btn" @click="removeItem(index)">
+      <button class="btn" @click="removeItem(index, item.id)">
         <i class="fa fa-remove"></i>
       </button>
     </div>
@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       isEdittingItem: false,
-      editItemTitle: this.item.title
+      editItemName: this.item.name
     };
   },
   methods: {
@@ -52,18 +52,18 @@ export default {
       this.isEdittingItem = value;
     },
     updateItem(item) {
-      if (this.editItemTitle != "") {
+      if (this.editItemName != "") {
         let newItem = {
           id: this.item.id,
-          title: this.editItemTitle,
-          isFinished: this.item.isFinished
+          name: this.editItemName,
+          done: this.item.done
         };
         this.$emit("updateItem", { index: this.index, item: newItem });
         this.toggleEditItem(false);
       }
     },
-    removeItem(index) {
-      this.$emit("removeItem", index);
+    removeItem(index, itemId) {
+      this.$emit("removeItem", { index: this.index, itemId: itemId });
     }
   }
 };

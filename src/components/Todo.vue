@@ -4,8 +4,8 @@
       v-if="!isEdittingTodo"
       class="d-flex flex-row mt-3 mb-3 row align-items-center"
     >
-      <p @dblclick="toggleEditTodo(true)" class="h4 todo-title col-lg-6">
-        {{ todo.title }}
+      <p @dblclick="toggleEditTodo(true)" class="h4 todo-name col-lg-6">
+        {{ todo.name }}
       </p>
 
       <div class="col-lg-6">
@@ -32,7 +32,7 @@
       @keypress.enter="updateTodo(todo)"
       type="text"
       class="form-control"
-      v-model="editTodoTitle"
+      v-model="editTodoName"
       placeholder="Enter to add. Esc to cancel"
     />
     <div class="progress mt-2">
@@ -49,7 +49,7 @@
       <ul class="list-group mt-3">
         <li
           class="list-group-item"
-          v-for="(item, index) in todo.items"
+          v-for="(item, index) in items"
           :key="item.id"
         >
           <item
@@ -96,30 +96,51 @@ export default {
     return {
       isAdding: false,
       newItem: "",
-      editTodoTitle: this.todo.title,
-      isEdittingTodo: false
+      editTodoName: this.todo.name,
+      isEdittingTodo: false,
+      items: []
     };
   },
   computed: {
     getProgressTodo() {
-      let a = this.todo.items.length;
+      let a = this.items.length;
       if (!a)
         return {
           width: "0%"
         };
-
-      let countDone = 0;
-      this.todo.items.forEach(item => {
-        if (item.isFinished) countDone++;
-      });
-      return {
-        width: (countDone / a) * 100 + "%"
-      };
+      if (this.items) {
+        let countDone = 0;
+        this.items.forEach(item => {
+          if (item.done) countDone++;
+        });
+        return {
+          width: (countDone / a) * 100 + "%"
+        };
+      }
     }
   },
+  mounted() {
+    this.fetchItem();
+  },
   methods: {
+    fetchItem() {
+      this.axios
+        .get("/task_lists/" + this.todo.id + "/todos")
+        .then(response => {
+          this.items = response.data;
+        })
+        .catch(error => {});
+    },
     checkFinished(index) {
-      this.todo.items[index].isFinished = !this.todo.items[index].isFinished;
+      let item = this.items[index];
+      this.axios
+        .put("/task_lists/" + this.todo.id + "/todos/" + item.id, {
+          done: !item.done
+        })
+        .then(response => {
+          this.items[index].done = !this.items[index].done;
+        })
+        .catch(error => {});
     },
     removeTodo(todoId) {
       this.$emit("removeTodo", todoId);
@@ -129,36 +150,58 @@ export default {
     },
     addItem() {
       if (this.newItem != "")
-        this.todo.items.push({
-          id: this.todo.items.length + 1,
-          title: this.newItem,
-          isFinished: false
-        });
+        this.axios
+          .post("/task_lists/" + this.todo.id + "/todos", {
+            name: this.newItem,
+            done: false
+          })
+          .then(response => {
+            this.items.push({
+              id: response.data.id,
+              name: response.data.name,
+              done: false
+            });
+          })
+          .catch(error => {});
       this.newItem = "";
     },
-    removeItem(index) {
+    removeItem(payload) {
       if (confirm("Do you really want to delete?")) {
-        if (index >= 0) {
-          this.todo.items.splice(index, 1);
-        }
+        this.axios
+          .delete("/task_lists/" + this.todo.id + "/todos/" + payload.itemId)
+          .then(response => {
+            if (payload.index >= 0) {
+              this.items.splice(payload.index, 1);
+            }
+          })
+          .catch(error => {});
       }
     },
 
     updateTodo(todo) {
-      if (this.editTodoTitle != "") {
+      if (this.editTodoName != "") {
         let newTodo = {
           id: this.todo.id,
-          title: this.editTodoTitle,
-          isFinished: this.todo.isFinished,
+          name: this.editTodoName,
+          done: this.todo.done,
           items: this.todo.items,
           createdAt: this.todo.createdAt
         };
+        
         this.$emit("updateTodo", { index: this.index, todo: newTodo });
         this.toggleEditTodo(false);
       }
     },
     updateItem(payload) {
-      this.todo.items.splice(payload.index, 1, payload.item);
+      this.axios
+        .put("/task_lists/" + this.todo.id + "/todos/" + payload.item.id, {
+          name: payload.item.name,
+          done: payload.item.done
+        })
+        .then(response => {
+          this.items.splice(payload.index, 1, response.data);
+        })
+        .catch(error => {});
     },
     toggleEditTodo(value) {
       this.isEdittingTodo = value;
@@ -168,7 +211,7 @@ export default {
 </script>
 
 <style>
-.todo-title {
+.todo-name {
   color: #646262;
 }
 

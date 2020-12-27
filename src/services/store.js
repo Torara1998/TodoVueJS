@@ -11,7 +11,7 @@ const getTodo = () => {
                     id: change.doc.id,
                     items: todo.items,
                     title: todo.title,
-                    isFinished: todo.isFinished,
+                    done: todo.done,
                     createdAt: todo.createdAt
                 })
             if (change.type === 'modified') {
@@ -20,7 +20,7 @@ const getTodo = () => {
                     'id': change.doc.id,
                     'title': todo.title,
                     'items': todo.items,
-                    'isFinished': todo.isFinished,
+                    'done': todo.done,
                     'createdAt': todo.createdAt,
                 })
 
@@ -37,18 +37,18 @@ const addTodo = (todo) => {
         id: uid.id,
         title: todo.title,
         createdAt: todo.createdAt,
-        isFinished: todo.isFinished,
+        done: todo.done,
         items: todo.items
     })
 }
 
 const updateTodo = (todo) => {
-    console.log(todo.id)
+    
     const ref = fb.usersCollection.doc(fb.auth.currentUser.uid).collection("todos")
     ref.doc(todo.id).update({
         title: todo.title,
         items: todo.items,
-        isFinished: todo.isFinished
+        done: todo.done
     })
 }
 

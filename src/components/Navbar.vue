@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Navbar</a>
+      <a class="navbar-brand" href="#">ToraTodo</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -60,6 +60,9 @@
           >
         </div>
       </div>
+      <div v-show="isAuthenticated" class="float-right">
+        <span>{{ getUserEmail }}</span>
+      </div>
     </nav>
   </div>
 </template>
@@ -69,12 +72,16 @@ import { auth } from "../plugins/firebase";
 export default {
   data() {
     return {
-      isAuthenticated: auth.currentUser ? true : false
+      // isAuthenticated: auth.currentUser ? true : false
+      isAuthenticated: localStorage.getItem("access_token") ? true : false
     };
   },
   computed: {
     getCurrentRoute() {
       return this.$route.path;
+    },
+    getUserEmail() {
+      return localStorage.getItem("uid", "");
     }
   },
   watch: {
@@ -90,4 +97,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.nav-link.active {
+  font-weight: 700;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="container">
     <navbar></navbar>
-    <img src="./assets/logo.png" />
+    <img src="./assets/cat.png" width="300px" />
 
     <router-view />
   </div>
@@ -9,7 +9,6 @@
 
 <script>
 import Navbar from "./components/Navbar";
-import * as fb from "./plugins/firebase";
 export default {
   name: "App",
   components: {
