@@ -3,7 +3,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
 
-axios.defaults.baseURL = "http://herokutuan.herokuapp.com/"
+axios.defaults.baseURL = "https://herokutuan.herokuapp.com"
 
 axios.defaults.headers["access-token"] = localStorage.getItem("access_token", "")
 axios.defaults.headers["client"] = localStorage.getItem("client", "")

@@ -131,6 +131,11 @@ export default {
   },
   created() {
     // this.todos = getTodo();
+    this.axios.defaults.headers["access-token"] = localStorage.getItem("access_token", "")
+    this.axios.defaults.headers["client"] = localStorage.getItem("client", "")
+    this.axios.defaults.headers["uid"] = localStorage.getItem("uid", "")
+
+
     this.axios
       .get("/task_lists")
       .then(response => {
